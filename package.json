@@ -11,6 +11,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "build.all": "npm run build.prod && npm run build.esnext",
+    "gen:components": "node ./types/codegen.js",
     "test": "karma start karma.config.js"
   },
   "keywords": [
@@ -35,6 +36,7 @@
     "karma-phantomjs-launcher": "1.0.4",
     "karma-webpack": "3.0.0",
     "source-map-loader": "0.2.3",
+    "ts-morph": "^19.0.0",
     "tslint": "5.17.0",
     "tslint-loader": "3.6.0",
     "typescript": "latest",
