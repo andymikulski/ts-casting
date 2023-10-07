@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import MainScene from './scenes/MainScene';
+import Cast from './types/cast.gen';
+import { IGrabbable } from './types/interfaces';
 
 new Phaser.Game({
   width: 1024,
