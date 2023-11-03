@@ -7,7 +7,8 @@ const project = new Project();
 const TSCONFIG_PATH = path.resolve(__dirname, "./tsconfig.json");
 const GEN_FILE_EXT = '.gen.ts';
 
-const PREFER_REUSE_CAST_FUNCTIONS = false;
+const FUNC_PREFIX = 'CastTo';
+const PREFER_REUSE_CAST_FUNCTIONS = true; // `true` can cause circular dependencies
 
 
 function getHeader(file: SourceFile) {
@@ -52,18 +53,32 @@ function processFile(sourceFile: SourceFile) {
 
   let imports = new Map<SourceFile, string[]>();
   let generatedCode = '';
+  let hasOutput = false;
 
   // for each interface found in this source file...
   interfaces.forEach(int => {
     const interfaceName = int.getName();
     var compiledPropChecks = processInterface(int, imports);
 
+    if (compiledPropChecks.length === 0) {
+      return;
+    }
+    hasOutput = true;
+
+    // Since the cast functions accept 'any' as a param, we need to double check the possibility
+    // that the input is null/undefined
+    compiledPropChecks.unshift('obj !== null && obj !== undefined');
+
     generatedCode += `
-export function Cast${interfaceName.slice(1)}(obj: any): ${interfaceName} | null {
+export function ${FUNC_PREFIX}${interfaceName.slice(1)}(obj: any): ${interfaceName} | null {
   return (${compiledPropChecks.join(" && ")}) ? obj : null;
 }
 `;
   });
+
+  if (!hasOutput) {
+    return;
+  }
 
   // generatedCode = `import type { ${Array.from(imports.values()).sort().join(", ")} } from './${sourceFile.getBaseNameWithoutExtension()}';\n\n${generatedCode}`;
 
@@ -82,9 +97,15 @@ export function Cast${interfaceName.slice(1)}(obj: any): ${interfaceName} | null
 }
 
 
-function processInterface(interfaceDeclaration: InterfaceDeclaration, importsRef: Map<SourceFile, string[]>, isInherited: boolean = false) {
+function processInterface(interfaceDeclaration: InterfaceDeclaration, importsRef: Map<SourceFile, string[]>, isInherited: boolean = false): string[] {
   const propertiesCheckCode: string[] = [];
   const interfaceName = interfaceDeclaration.getName();
+
+  if (interfaceName.charAt(0) !== 'I') {
+    console.log(`Skipping interface "${interfaceName}"`);
+    return propertiesCheckCode;
+  }
+
   if (!isInherited) {
     const file = interfaceDeclaration.getSourceFile()
     const list = (importsRef.get(file) ?? []);
@@ -97,13 +118,12 @@ function processInterface(interfaceDeclaration: InterfaceDeclaration, importsRef
   // IF TRYING TO REUSE EXISTING CAST FUNCTIONS...
   if (PREFER_REUSE_CAST_FUNCTIONS) {
     interfaceDeclaration.getBaseDeclarations().forEach((i) => {
-      propertiesCheckCode.push(`Cast${i.getName()!.slice(1)}(obj) !== null`);
+      propertiesCheckCode.push(`${FUNC_PREFIX}${i.getName()!.slice(1)}(obj) !== null`);
     });
   } else {
-    interfaceDeclaration.getBaseDeclarations().filter(x => x instanceof InterfaceDeclaration).forEach((i) => {
-      propertiesCheckCode.push.apply(
-        propertiesCheckCode, processInterface(<InterfaceDeclaration>i, importsRef, true)
-      )
+    interfaceDeclaration.getBaseDeclarations().forEach((i) => {
+      const subProps = processInterface(<InterfaceDeclaration>i, importsRef, true);
+      propertiesCheckCode.push(...subProps);
     });
   }
 

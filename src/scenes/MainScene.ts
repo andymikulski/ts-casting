@@ -1,12 +1,12 @@
 import Phaser, { Input } from 'phaser';
 import { IGrabbable } from '../types/interfaces';
-import { CastMario } from './MainScene.gen';
+import { CastToMario } from './MainScene.gen';
 
 const NUM_MARIOS = 10;
 
 
 export interface IMario extends IGrabbable {
-  DoMarioThing():void;
+  DoMarioThing(): void;
 }
 
 class Mario extends Phaser.GameObjects.Image implements IMario {
@@ -51,7 +51,7 @@ export default class MainScene extends Phaser.Scene {
   };
 
   emitPointerDown = (emitter: unknown) => {
-    const grabbable = CastMario(emitter);
+    const grabbable = CastToMario(emitter);
     if (!grabbable) { return; }
     console.log('clicked grabbable: ', grabbable.GetNumber());
   };

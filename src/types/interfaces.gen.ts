@@ -2,26 +2,26 @@
 // This file was generated from `interfaces.ts` by running `npm run gen:components`.
 import type { IGrabbable, IGrabber, IAdvancedGrabber, ISomethingElse, IMyThing, IBlergh } from '../types/interfaces';
 
-export function CastGrabbable(obj: any): IGrabbable | null {
-  return (typeof(obj.GetNumber) === "function" && typeof(obj.GetThing) === "function") ? obj : null;
+export function CastToGrabbable(obj: any): IGrabbable | null {
+  return (obj !== null && obj !== undefined && typeof(obj.GetNumber) === "function" && typeof(obj.GetThing) === "function") ? obj : null;
 }
 
-export function CastGrabber(obj: any): IGrabber | null {
-  return (typeof(obj.DoThing) === "function" && typeof(obj.speed) === "number") ? obj : null;
+export function CastToGrabber(obj: any): IGrabber | null {
+  return (obj !== null && obj !== undefined && typeof(obj.DoThing) === "function" && typeof(obj.speed) === "number") ? obj : null;
 }
 
-export function CastAdvancedGrabber(obj: any): IAdvancedGrabber | null {
-  return (typeof(obj.GetNumber) === "function" && typeof(obj.GetThing) === "function" && typeof(obj.OtherThing) === "function") ? obj : null;
+export function CastToAdvancedGrabber(obj: any): IAdvancedGrabber | null {
+  return (obj !== null && obj !== undefined && CastToGrabbable(obj) !== null && typeof(obj.OtherThing) === "function") ? obj : null;
 }
 
-export function CastSomethingElse(obj: any): ISomethingElse | null {
-  return (typeof(obj.GetNumber) === "function" && typeof(obj.GetThing) === "function" && typeof(obj.OtherThing) === "function" && typeof(obj.Fart) === "function") ? obj : null;
+export function CastToSomethingElse(obj: any): ISomethingElse | null {
+  return (obj !== null && obj !== undefined && CastToAdvancedGrabber(obj) !== null && typeof(obj.Fart) === "function") ? obj : null;
 }
 
-export function CastMyThing(obj: any): IMyThing | null {
-  return ((typeof(obj.NullableThing) === "number" || obj.NullableThing === null)) ? obj : null;
+export function CastToMyThing(obj: any): IMyThing | null {
+  return (obj !== null && obj !== undefined && (typeof(obj.NullableThing) === "number" || obj.NullableThing === null)) ? obj : null;
 }
 
-export function CastBlergh(obj: any): IBlergh | null {
-  return (typeof(obj.GetAAAAAAAAAAAHHHHThing) === "function") ? obj : null;
+export function CastToBlergh(obj: any): IBlergh | null {
+  return (obj !== null && obj !== undefined && typeof(obj.GetAAAAAAAAAAAHHHHThing) === "function") ? obj : null;
 }
