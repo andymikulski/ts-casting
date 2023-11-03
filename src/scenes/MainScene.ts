@@ -1,23 +1,29 @@
 import Phaser, { Input } from 'phaser';
 import { IGrabbable } from '../types/interfaces';
-import Cast from '../types/cast.gen';
+import { CastMario } from './MainScene.gen';
 
 const NUM_MARIOS = 10;
 
 
-class Mario extends Phaser.GameObjects.Image implements IGrabbable {
+export interface IMario extends IGrabbable {
+  DoMarioThing():void;
+}
+
+class Mario extends Phaser.GameObjects.Image implements IMario {
+  DoMarioThing(): void {
+    console.log('maarrrrio');
+  }
   GetNumber(): number {
     return 123;
   }
   GetThing(): object | null {
     return this;
   }
-
 }
 
 
 export default class MainScene extends Phaser.Scene {
-  private marios: Phaser.GameObjects.Image[] = [];
+  private marios: Mario[] = [];
 
   preload = () => {
     this.load.image('mario', 'https://i.imgur.com/nKgMvuj.png');
@@ -39,14 +45,13 @@ export default class MainScene extends Phaser.Scene {
       this.marios.push(mario);
 
       mario.setInteractive().on('pointerdown', () => {
-        console.log('mario click..');
         this.emitPointerDown(mario);
       });
     }
   };
 
   emitPointerDown = (emitter: unknown) => {
-    const grabbable = Cast.toGrabbable(emitter);
+    const grabbable = CastMario(emitter);
     if (!grabbable) { return; }
     console.log('clicked grabbable: ', grabbable.GetNumber());
   };

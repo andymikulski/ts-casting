@@ -12,6 +12,15 @@ export interface IAdvancedGrabber extends IGrabbable {
   OtherThing(): number;
 }
 
+export interface ISomethingElse extends IAdvancedGrabber {
+  Fart(): void;
+}
+
+export interface IMyThing {
+  OptionalThing?: number;
+  NullableThing: number|null;
+}
+
 export interface IBlergh {
   GetAAAAAAAAAAAHHHHThing(): number;
 }
